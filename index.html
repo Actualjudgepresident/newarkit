@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newark IT - Online Computer Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Newark IT</h1>
+        <nav>
+            <a href="#products">Products</a>
+            <a href="#register">Register</a>
+            <a href="#login">Login</a>
+            <a href="#basket">Basket</a>
+        </nav>
+    </header>
+
+    <section id="products">
+        <h2>Available Products</h2>
+        <div class="product-list">
+            <!-- Dynamically loaded via JS -->
+        </div>
+    </section>
+
+    <section id="register">
+        <h2>Customer Registration</h2>
+        <form id="registerForm">
+            <input type="text" placeholder="Name" name="name" required>
+            <input type="email" placeholder="Email" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            <input type="text" placeholder="Shipping Address" name="address" required>
+            <input type="text" placeholder="Credit Card" name="creditCard" required>
+            <button type="submit">Register</button>
+        </form>
+    </section>
+
+    <section id="login">
+        <h2>Customer Login</h2>
+        <form id="loginForm">
+            <input type="email" placeholder="Email" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+    </section>
+
+    <section id="basket">
+        <h2>Shopping Basket</h2>
+        <div id="basketItems">
+            <!-- Items will appear here -->
+        </div>
+        <button id="checkoutBtn">Checkout</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Newark IT. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
