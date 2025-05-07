@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import db from '../connect.js';
 
 // Get all products
 export const getAllProducts = (req, res) => {
+=======
+const db = require('../connect');
+
+exports.getAllProducts = (req, res) => {
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   const sql = 'SELECT * FROM Product';
 
   db.query(sql, (err, results) => {
@@ -13,8 +19,12 @@ export const getAllProducts = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
 // Get product by ID
 export const getProductById = (req, res) => {
+=======
+exports.getProductById = (req, res) => {
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   const sql = 'SELECT * FROM Product WHERE id = ?';
   const id = req.params.id;
 
@@ -30,6 +40,7 @@ export const getProductById = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
 // Create new product
 export const createProduct = (req, res) => {
   const { name, price, image } = req.body;
@@ -39,6 +50,18 @@ export const createProduct = (req, res) => {
   }
 
   const sql = 'INSERT INTO Product (name, price, image) VALUES (?, ?, ?)';
+=======
+
+exports.createProduct = (req, res) => {
+  const { name, price, image } = req.body;
+
+  if (!name || !price || !image) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  const sql = 'INSERT INTO Product (name, price, image) VALUES (?, ?, ?)';
+
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   db.query(sql, [name, price, image], (err, result) => {
     if (err) {
       console.error('Insert error:', err);
@@ -48,12 +71,20 @@ export const createProduct = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
 // Update product
 export const updateProduct = (req, res) => {
+=======
+exports.updateProduct = (req, res) => {
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   const { name, price, image } = req.body;
   const id = req.params.id;
 
   const sql = 'UPDATE Product SET name = ?, price = ?, image = ? WHERE id = ?';
+<<<<<<< HEAD
+=======
+
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   db.query(sql, [name, price, image, id], (err, result) => {
     if (err) {
       console.error('Update error:', err);
@@ -66,11 +97,18 @@ export const updateProduct = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
 // Delete product
 export const deleteProduct = (req, res) => {
   const id = req.params.id;
 
   const sql = 'DELETE FROM Product WHERE id = ?';
+=======
+exports.deleteProduct = (req, res) => {
+  const id = req.params.id;
+  const sql = 'DELETE FROM Product WHERE id = ?';
+
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
   db.query(sql, [id], (err, result) => {
     if (err) {
       console.error('Delete error:', err);

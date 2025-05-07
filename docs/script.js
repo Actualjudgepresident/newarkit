@@ -1,5 +1,6 @@
 const backendUrl = 'http://localhost:3000';
 
+<<<<<<< HEAD
 function detectCardType(number) {
   const regexMap = {
     Visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
@@ -32,15 +33,34 @@ document.addEventListener('DOMContentLoaded', () => {
     data.cardType = detectCardType(data.creditCard);
     try {
       const res = await fetch(`${backendUrl}/api/users/register`, {
+=======
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch(`${backendUrl}/register`, {
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+<<<<<<< HEAD
       const result = await res.json();
       if (res.ok) {
         alert(result.message || 'Registration successful!');
         window.location.hash = '#login';
       } else {
+=======
+
+      if (res.ok) {
+        alert('Registration successful!');
+        window.location.hash = '#login';
+      } else {
+        const result = await res.json();
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
         alert('Error: ' + (result.message || 'Registration failed'));
       }
     } catch (err) {
@@ -48,32 +68,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+<<<<<<< HEAD
   document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
     try {
       const res = await fetch(`${backendUrl}/api/users/login`, {
+=======
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch(`${backendUrl}/login`, {
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+<<<<<<< HEAD
       const result = await res.json();
       if (res.ok) {
         localStorage.setItem('token', result.token || '');
         alert(result.message || 'Login successful!');
         window.location.hash = '#products';
       } else {
+=======
+
+      if (res.ok) {
+        const { token } = await res.json();
+        localStorage.setItem('token', token);
+        alert('Login successful');
+        window.location.hash = '#products';
+      } else {
+        const result = await res.json();
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
         alert('Error: ' + (result.message || 'Login failed'));
       }
     } catch (err) {
       alert('Server error: ' + err.message);
     }
   });
+<<<<<<< HEAD
 
   document.getElementById('checkoutBtn')?.addEventListener('click', () => {
     alert('Proceeding to checkout...');
   });
+=======
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
 });
 
 function updateVisibleSection() {

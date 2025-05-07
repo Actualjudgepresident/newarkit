@@ -81,6 +81,140 @@
     <p>&copy; 2025 Newark IT. All rights reserved.</p>
   </footer>
 
+<<<<<<< HEAD
   <script src="script.js"></script>
+=======
+  <script>
+    const backendUrl = 'http://localhost:3000';
+
+    function updateVisibleSection() {
+      const sections = {
+        products: document.getElementById("products"),
+        login: document.getElementById("login"),
+        register: document.getElementById("register"),
+        basket: document.getElementById("basket"),
+      };
+
+      const hash = location.hash.slice(1) || 'products';
+      Object.values(sections).forEach(sec => sec.classList.remove('active'));
+
+      if (sections[hash]) {
+        sections[hash].classList.add('active');
+        if (hash === 'products') loadProducts();
+        if (hash === 'basket') updateBasketUI();
+      }
+    }
+
+    window.addEventListener('hashchange', updateVisibleSection);
+    document.addEventListener('DOMContentLoaded', () => {
+      updateVisibleSection();
+
+      // Register
+      document.getElementById('registerForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(this).entries());
+        try {
+          const res = await fetch(`${backendUrl}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) {
+            alert('Registration successful!');
+            window.location.hash = '#products';
+          } else {
+            const result = await res.json();
+            alert('Error: ' + (result.message || 'Registration failed'));
+          }
+        } catch (err) {
+          alert('Server error: ' + err.message);
+        }
+      });
+
+      // Login
+      document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(this).entries());
+        try {
+          const res = await fetch(`${backendUrl}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) {
+            const { token } = await res.json();
+            localStorage.setItem('token', token);
+            alert('Login successful!');
+            window.location.hash = '#products';
+          } else {
+            const result = await res.json();
+            alert('Error: ' + (result.message || 'Login failed'));
+          }
+        } catch (err) {
+          alert('Server error: ' + err.message);
+        }
+      });
+
+      // Checkout → login if not authenticated
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Please login to proceed with checkout.');
+          window.location.hash = '#login';
+        } else {
+          alert('Checkout process started.');
+        }
+      });
+    });
+
+    async function loadProducts() {
+      const productList = document.querySelector('.product-list');
+      productList.innerHTML = '';
+
+      try {
+        const res = await fetch(`${backendUrl}/products`);
+        const products = await res.json();
+
+        products.forEach(product => {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" />
+            <h3>${product.name}</h3>
+            <p>Price: $${product.price}</p>
+            <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
+          `;
+          productList.appendChild(div);
+        });
+      } catch (err) {
+        productList.innerHTML = '<p>Error loading products. Try again later.</p>';
+        console.error(err);
+      }
+    }
+
+    function addToBasket(id, name, price) {
+      let basket = JSON.parse(localStorage.getItem('basket')) || [];
+      basket.push({ id, name, price });
+      localStorage.setItem('basket', JSON.stringify(basket));
+      updateBasketUI();
+    }
+
+    function updateBasketUI() {
+      const basketItems = document.getElementById('basketItems');
+      const basket = JSON.parse(localStorage.getItem('basket')) || [];
+      basketItems.innerHTML = '';
+
+      if (basket.length === 0) {
+        basketItems.innerHTML = '<p>Your basket is empty.</p>';
+        return;
+      }
+
+      basket.forEach(item => {
+        const div = document.createElement('div');
+        div.textContent = `${item.name} - $${item.price}`;
+        basketItems.appendChild(div);
+      });
+    }
+  </script>
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
 </body>
 </html>

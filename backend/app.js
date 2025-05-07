@@ -1,8 +1,15 @@
 // backend/app.js
 import express from 'express';
 import cors from 'cors';
+<<<<<<< HEAD
 import path from 'path';
 import { fileURLToPath } from 'url';
+=======
+import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import dotenv from 'dotenv';
+import db from './connect.js';
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
 
 import db from './connect.js';
 import userRoutes from './routes/userRoutes.js';
@@ -19,6 +26,7 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
+<<<<<<< HEAD
 // API Routes should come first
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
@@ -48,4 +56,12 @@ db.connect((err) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+=======
+app.use('/', userRoutes);
+app.use('/', productRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+>>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
 });
