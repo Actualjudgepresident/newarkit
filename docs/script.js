@@ -8,14 +8,31 @@ function loadProducts() {
   productList.innerHTML = '';
 
   const products = [
-    { id: 1, name: 'Gaming Laptop', price: 1000 },
-    { id: 2, name: 'Wireless Mouse', price: 25 },
-    { id: 3, name: '4K Monitor', price: 350 }
+    {
+      id: 1,
+      name: 'Gaming Laptop',
+      price: 1000,
+      img: 'images/laptop.jpg'
+    },
+    {
+      id: 2,
+      name: 'Wireless Mouse',
+      price: 25,
+      img: 'images/mouse.jpg'
+    },
+    {
+      id: 3,
+      name: '4K Monitor',
+      price: 350,
+      img: 'images/monitor.jpg'
+    }
   ];
 
   products.forEach(product => {
     const div = document.createElement('div');
+    div.classList.add('product-card');
     div.innerHTML = `
+      <img src="${product.img}" alt="${product.name}" />
       <h3>${product.name}</h3>
       <p>Price: $${product.price}</p>
       <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
