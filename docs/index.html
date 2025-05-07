@@ -13,6 +13,12 @@
       padding: 10px;
       border: 1px solid #ccc;
     }
+    .product-list img {
+      width: 150px;
+      height: auto;
+      display: block;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -74,7 +80,7 @@
   </footer>
 
   <script>
-    // Section routing
+    // Routing logic
     function updateVisibleSection() {
       const sections = {
         products: document.getElementById("products"),
@@ -103,12 +109,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
+      // Register logic
       document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
 
-        // POST to /register backend
         const res = await fetch('http://localhost:3000/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -117,19 +123,19 @@
 
         if (res.ok) {
           alert('Registration successful!');
-          window.location.hash = '#login';
+          window.location.hash = '#products';
         } else {
           const { message } = await res.json();
           alert('Error: ' + message);
         }
       });
 
+      // Login logic
       document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
 
-        // POST to /login backend
         const res = await fetch('http://localhost:3000/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -147,25 +153,27 @@
         }
       });
 
+      // Checkout → Login
       document.getElementById('checkoutBtn').addEventListener('click', () => {
         window.location.hash = '#login';
       });
     });
 
-    // Product List
+    // Products
     function loadProducts() {
       const productList = document.querySelector('.product-list');
       productList.innerHTML = '';
 
       const products = [
-        { id: 1, name: 'Gaming Laptop', price: 1000 },
-        { id: 2, name: 'Wireless Mouse', price: 25 },
-        { id: 3, name: '4K Monitor', price: 350 }
+        { id: 1, name: 'Gaming Laptop', price: 1000, image: 'https://via.placeholder.com/150?text=Laptop' },
+        { id: 2, name: 'Wireless Mouse', price: 25, image: 'https://via.placeholder.com/150?text=Mouse' },
+        { id: 3, name: '4K Monitor', price: 350, image: 'https://via.placeholder.com/150?text=Monitor' }
       ];
 
       products.forEach(product => {
         const div = document.createElement('div');
         div.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
           <h3>${product.name}</h3>
           <p>Price: $${product.price}</p>
           <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
@@ -174,7 +182,7 @@
       });
     }
 
-    // Basket Functions
+    // Basket
     function addToBasket(id, name, price) {
       let basket = JSON.parse(localStorage.getItem('basket')) || [];
       basket.push({ id, name, price });
