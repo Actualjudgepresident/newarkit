@@ -33,13 +33,13 @@
   </header>
 
   <main>
-    <!-- Products -->
+    <!-- Product Section -->
     <section id="products">
       <h2>Available Products</h2>
       <div class="product-list"></div>
     </section>
 
-    <!-- Login -->
+    <!-- Login Form -->
     <section id="login">
       <h2>Customer Login</h2>
       <form id="loginForm">
@@ -50,15 +50,18 @@
       <p>Don't have an account? <a href="#register">Register here</a>.</p>
     </section>
 
-    <!-- Register -->
+    <!-- Register Form -->
     <section id="register">
       <h2>Customer Registration</h2>
       <form id="registerForm">
-        <input type="text" name="name" placeholder="Name" required />
+        <input type="text" name="firstName" placeholder="First Name" required />
+        <input type="text" name="lastName" placeholder="Last Name" required />
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
         <input type="text" name="address" placeholder="Shipping Address" required />
         <input type="text" name="creditCard" placeholder="Credit Card" required />
+        <input type="text" name="securityCode" placeholder="Security Code" required />
+        <div id="cardTypeDisplay"></div>
         <button type="submit">Register</button>
       </form>
       <p>Already have an account? <a href="#login">Login here</a>.</p>
@@ -78,129 +81,6 @@
     <p>&copy; 2025 Newark IT. All rights reserved.</p>
   </footer>
 
-  <script>
-    const backendUrl = 'http://localhost:3000';
-
-    function updateVisibleSection() {
-      const sections = {
-        products: document.getElementById("products"),
-        login: document.getElementById("login"),
-        register: document.getElementById("register"),
-        basket: document.getElementById("basket"),
-      };
-
-      const hash = location.hash.slice(1) || 'products';
-      Object.values(sections).forEach(sec => sec.classList.remove('active'));
-
-      if (sections[hash]) {
-        sections[hash].classList.add('active');
-        if (hash === 'products') loadProducts();
-        if (hash === 'basket') updateBasketUI();
-      }
-    }
-
-    window.addEventListener('hashchange', updateVisibleSection);
-    document.addEventListener('DOMContentLoaded', () => {
-      updateVisibleSection();
-
-      document.getElementById('registerForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-          const res = await fetch(`${backendUrl}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          if (res.ok) {
-            alert('Registration successful!');
-            window.location.hash = '#products';
-          } else {
-            const result = await res.json();
-            alert('Error: ' + (result.message || 'Registration failed'));
-          }
-        } catch (err) {
-          alert('Server error: ' + err.message);
-        }
-      });
-
-      document.getElementById('loginForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-          const res = await fetch(`${backendUrl}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          if (res.ok) {
-            const { token } = await res.json();
-            localStorage.setItem('token', token);
-            alert('Login successful!');
-            window.location.hash = '#products';
-          } else {
-            const result = await res.json();
-            alert('Error: ' + (result.message || 'Login failed'));
-          }
-        } catch (err) {
-          alert('Server error: ' + err.message);
-        }
-      });
-
-      document.getElementById('checkoutBtn').addEventListener('click', () => {
-        window.location.hash = '#login';
-      });
-    });
-
-    function loadProducts() {
-      const productList = document.querySelector('.product-list');
-      productList.innerHTML = '';
-
-      const products = [
-        { id: 1, name: 'Gaming Laptop', price: 1000, image: 'https://via.placeholder.com/150?text=Laptop' },
-        { id: 2, name: 'Wireless Mouse', price: 25, image: 'https://via.placeholder.com/150?text=Mouse' },
-        { id: 3, name: '4K Monitor', price: 350, image: 'https://via.placeholder.com/150?text=Monitor' }
-      ];
-
-      products.forEach(product => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" />
-          <h3>${product.name}</h3>
-          <p>Price: $${product.price}</p>
-          <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
-        `;
-        productList.appendChild(div);
-      });
-    }
-
-    function addToBasket(id, name, price) {
-      let basket = JSON.parse(localStorage.getItem('basket')) || [];
-      basket.push({ id, name, price });
-      localStorage.setItem('basket', JSON.stringify(basket));
-      updateBasketUI();
-    }
-
-    function updateBasketUI() {
-      const basketItems = document.getElementById('basketItems');
-      const basket = JSON.parse(localStorage.getItem('basket')) || [];
-      basketItems.innerHTML = '';
-
-      if (basket.length === 0) {
-        basketItems.innerHTML = '<p>Your basket is empty.</p>';
-        return;
-      }
-
-      basket.forEach(item => {
-        const div = document.createElement('div');
-        div.textContent = `${item.name} - $${item.price}`;
-        basketItems.appendChild(div);
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
