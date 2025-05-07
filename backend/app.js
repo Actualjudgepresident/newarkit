@@ -1,19 +1,13 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import userRoutes from './routes/users.js';
-import productRoutes from './routes/products.js';
-
-dotenv.config();
-
+const express = require('express');
+const cors = require('cors');
 const app = express();
+require('dotenv').config();
+
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
+app.use('/', require('./routes/userRoutes'));
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(5000, () => console.log('Server running on port 5000')))
-  .catch(err => console.error(err));
+app.listen(3000, () => {
+  console.log('🚀 Server running at http://localhost:3000');
+});
