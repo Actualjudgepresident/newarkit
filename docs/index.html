@@ -103,11 +103,10 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
+      // Register
       document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-
+        const data = Object.fromEntries(new FormData(this).entries());
         try {
           const res = await fetch(`${backendUrl}/register`, {
             method: 'POST',
@@ -126,11 +125,10 @@
         }
       });
 
+      // Login
       document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-
+        const data = Object.fromEntries(new FormData(this).entries());
         try {
           const res = await fetch(`${backendUrl}/login`, {
             method: 'POST',
@@ -151,31 +149,40 @@
         }
       });
 
+      // Checkout → login if not authenticated
       document.getElementById('checkoutBtn').addEventListener('click', () => {
-        window.location.hash = '#login';
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Please login to proceed with checkout.');
+          window.location.hash = '#login';
+        } else {
+          alert('Checkout process started.');
+        }
       });
     });
 
-    function loadProducts() {
+    async function loadProducts() {
       const productList = document.querySelector('.product-list');
       productList.innerHTML = '';
 
-      const products = [
-        { id: 1, name: 'Gaming Laptop', price: 1000, image: 'https://via.placeholder.com/150?text=Laptop' },
-        { id: 2, name: 'Wireless Mouse', price: 25, image: 'https://via.placeholder.com/150?text=Mouse' },
-        { id: 3, name: '4K Monitor', price: 350, image: 'https://via.placeholder.com/150?text=Monitor' }
-      ];
+      try {
+        const res = await fetch(`${backendUrl}/products`);
+        const products = await res.json();
 
-      products.forEach(product => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" />
-          <h3>${product.name}</h3>
-          <p>Price: $${product.price}</p>
-          <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
-        `;
-        productList.appendChild(div);
-      });
+        products.forEach(product => {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" />
+            <h3>${product.name}</h3>
+            <p>Price: $${product.price}</p>
+            <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
+          `;
+          productList.appendChild(div);
+        });
+      } catch (err) {
+        productList.innerHTML = '<p>Error loading products. Try again later.</p>';
+        console.error(err);
+      }
     }
 
     function addToBasket(id, name, price) {
