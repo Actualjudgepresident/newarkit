@@ -6,8 +6,13 @@
   <title>Newark IT - Online Computer Store</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
-    section { display: none; }
+    section { display: none; padding: 20px; }
     section.active { display: block; }
+    .product-list div, #basketItems div {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -22,20 +27,14 @@
   </header>
 
   <main>
-    <!-- Product Section -->
+    <!-- Products -->
     <section id="products">
       <h2>Available Products</h2>
-      <div class="product-scroll">
-        <div class="product-list">
-          <div><strong>Gaming Laptop</strong><p>Price: $1000</p><button>Add to Basket</button></div>
-          <div><strong>Wireless Mouse</strong><p>Price: $25</p><button>Add to Basket</button></div>
-          <div><strong>4K Monitor</strong><p>Price: $350</p><button>Add to Basket</button></div>
-        </div>
-      </div>
+      <div class="product-list"></div>
       <p><a href="#register">Register to buy products</a></p>
     </section>
 
-    <!-- Login Form -->
+    <!-- Login -->
     <section id="login">
       <h2>Customer Login</h2>
       <form id="loginForm">
@@ -43,9 +42,10 @@
         <input type="password" name="password" placeholder="Password" required />
         <button type="submit">Login</button>
       </form>
+      <p>Don't have an account? <a href="#register">Register here</a>.</p>
     </section>
 
-    <!-- Register Form -->
+    <!-- Register -->
     <section id="register">
       <h2>Customer Registration</h2>
       <form id="registerForm">
@@ -56,6 +56,7 @@
         <input type="text" name="creditCard" placeholder="Credit Card" required />
         <button type="submit">Register</button>
       </form>
+      <p>Already have an account? <a href="#login">Login here</a>.</p>
     </section>
 
     <!-- Basket -->
@@ -73,6 +74,7 @@
   </footer>
 
   <script>
+    // Section routing
     function updateVisibleSection() {
       const sections = {
         products: document.getElementById("products"),
@@ -82,35 +84,120 @@
       };
 
       const hash = location.hash.slice(1) || 'products';
-
-      // Hide all sections
       Object.values(sections).forEach(sec => sec.classList.remove('active'));
 
-      // Show only relevant section
       if (hash === 'products') {
         sections.products.classList.add('active');
+        loadProducts();
       } else if (hash === 'login') {
         sections.login.classList.add('active');
       } else if (hash === 'register') {
         sections.register.classList.add('active');
       } else if (hash === 'basket') {
         sections.basket.classList.add('active');
+        updateBasketUI();
       }
     }
 
-    // Initial load and hash change listener
-    window.addEventListener("hashchange", updateVisibleSection);
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener('hashchange', updateVisibleSection);
+    document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
-      // Checkout button behavior
-      const checkoutBtn = document.getElementById('checkoutBtn');
-      if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-          window.location.hash = '#login';
+      document.getElementById('registerForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        // POST to /register backend
+        const res = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
         });
-      }
+
+        if (res.ok) {
+          alert('Registration successful!');
+          window.location.hash = '#login';
+        } else {
+          const { message } = await res.json();
+          alert('Error: ' + message);
+        }
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        // POST to /login backend
+        const res = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          const { token } = await res.json();
+          localStorage.setItem('token', token);
+          alert('Login successful');
+          window.location.hash = '#products';
+        } else {
+          const { message } = await res.json();
+          alert('Error: ' + message);
+        }
+      });
+
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        window.location.hash = '#login';
+      });
     });
+
+    // Product List
+    function loadProducts() {
+      const productList = document.querySelector('.product-list');
+      productList.innerHTML = '';
+
+      const products = [
+        { id: 1, name: 'Gaming Laptop', price: 1000 },
+        { id: 2, name: 'Wireless Mouse', price: 25 },
+        { id: 3, name: '4K Monitor', price: 350 }
+      ];
+
+      products.forEach(product => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <h3>${product.name}</h3>
+          <p>Price: $${product.price}</p>
+          <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    // Basket Functions
+    function addToBasket(id, name, price) {
+      let basket = JSON.parse(localStorage.getItem('basket')) || [];
+      basket.push({ id, name, price });
+      localStorage.setItem('basket', JSON.stringify(basket));
+      updateBasketUI();
+    }
+
+    function updateBasketUI() {
+      const basketItems = document.getElementById('basketItems');
+      const basket = JSON.parse(localStorage.getItem('basket')) || [];
+      basketItems.innerHTML = '';
+
+      if (basket.length === 0) {
+        basketItems.innerHTML = '<p>Your basket is empty.</p>';
+        return;
+      }
+
+      basket.forEach(item => {
+        const div = document.createElement('div');
+        div.textContent = `${item.name} - $${item.price}`;
+        basketItems.appendChild(div);
+      });
+    }
   </script>
 </body>
 </html>
