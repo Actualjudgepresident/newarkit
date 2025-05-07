@@ -1,13 +1,8 @@
-import express from 'express';
-
+const express = require('express');
 const router = express.Router();
+const { registerUser, loginUser } = require('../controllers/userController');
 
-router.post('/register', (req, res) => {
-  res.json({ message: 'User registered (demo only)' });
-});
+router.post('/register', registerUser);
+router.post('/login', loginUser);
 
-router.post('/login', (req, res) => {
-  res.json({ message: 'Login successful (demo only)' });
-});
-
-export default router;
+module.exports = router;

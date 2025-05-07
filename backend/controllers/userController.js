@@ -1,27 +1,20 @@
-const User = require('../models/User');
+const db = require('../connect');
 
-exports.registerUser = async (req, res) => {
-  try {
-    const { name, email, password, address, creditCard } = req.body;
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ error: 'Email already registered' });
-
-    const newUser = new User({ name, email, password, address, creditCard });
-    await newUser.save();
+exports.registerUser = (req, res) => {
+  const { name, email, password, address, creditCard } = req.body;
+  const query = 'INSERT INTO Customer (name, email, password, address, creditCard) VALUES (?, ?, ?, ?, ?)';
+  db.query(query, [name, email, password, address, creditCard], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Registration failed', error: err });
     res.status(201).json({ message: 'User registered successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+  });
 };
 
-exports.loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email, password }); // (Hashing recommended for real apps)
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-
-    res.status(200).json({ message: 'Login successful' });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+exports.loginUser = (req, res) => {
+  const { email, password } = req.body;
+  const query = 'SELECT * FROM Customer WHERE email = ? AND password = ?';
+  db.query(query, [email, password], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Login error', error: err });
+    if (results.length === 0) return res.status(401).json({ message: 'Invalid credentials' });
+    res.status(200).json({ token: 'demo-jwt-token' }); // Replace with real JWT in production
+  });
 };
