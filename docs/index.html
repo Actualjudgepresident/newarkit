@@ -27,7 +27,9 @@
       <h2>Available Products</h2>
       <div class="product-scroll">
         <div class="product-list">
-          <!-- JS will inject products here -->
+          <div><strong>Gaming Laptop</strong><p>Price: $1000</p><button>Add to Basket</button></div>
+          <div><strong>Wireless Mouse</strong><p>Price: $25</p><button>Add to Basket</button></div>
+          <div><strong>4K Monitor</strong><p>Price: $350</p><button>Add to Basket</button></div>
         </div>
       </div>
       <p><a href="#register">Register to buy products</a></p>
@@ -71,28 +73,43 @@
   </footer>
 
   <script>
-    // Show the correct section based on hash
     function updateVisibleSection() {
-      const sections = document.querySelectorAll("main > section");
-      const current = location.hash.slice(1) || 'products';
+      const sections = {
+        products: document.getElementById("products"),
+        login: document.getElementById("login"),
+        register: document.getElementById("register"),
+        basket: document.getElementById("basket"),
+      };
 
-      sections.forEach(sec => {
-        if (sec.id === current) {
-          sec.classList.add("active");
-        } else {
-          sec.classList.remove("active");
-        }
-      });
+      const hash = location.hash.slice(1) || 'products';
+
+      // Hide all sections
+      Object.values(sections).forEach(sec => sec.classList.remove('active'));
+
+      // Show only relevant section
+      if (hash === 'products') {
+        sections.products.classList.add('active');
+      } else if (hash === 'login') {
+        sections.login.classList.add('active');
+      } else if (hash === 'register') {
+        sections.register.classList.add('active');
+      } else if (hash === 'basket') {
+        sections.basket.classList.add('active');
+      }
     }
 
+    // Initial load and hash change listener
     window.addEventListener("hashchange", updateVisibleSection);
     window.addEventListener("DOMContentLoaded", () => {
       updateVisibleSection();
 
-      document.getElementById("checkoutBtn").addEventListener("click", () => {
-        // Redirect to login on checkout
-        location.hash = "#login";
-      });
+      // Checkout button behavior
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+          window.location.hash = '#login';
+        });
+      }
     });
   </script>
 </body>
