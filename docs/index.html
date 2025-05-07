@@ -8,23 +8,30 @@
   <style>
     section { display: none; padding: 20px; }
     section.active { display: block; }
-    .product-list {
-      display: flex;
-      overflow-x: auto;
-      gap: 15px;
-      padding: 10px;
+    .product-list h3 {
+      margin-top: 20px;
     }
-    .product-list div {
+    .category-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .category-group div {
       min-width: 200px;
       border: 1px solid #ccc;
       padding: 10px;
-      flex-shrink: 0;
     }
-    .product-list img {
-      width: 100%;
+    .category-group img {
+      width: 150px;
       height: auto;
       display: block;
       margin-bottom: 8px;
+    }
+    #basketItems div {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -40,11 +47,13 @@
   </header>
 
   <main>
+    <!-- Products -->
     <section id="products">
       <h2>Available Products</h2>
       <div class="product-list"></div>
     </section>
 
+    <!-- Login -->
     <section id="login">
       <h2>Customer Login</h2>
       <form id="loginForm">
@@ -55,11 +64,11 @@
       <p>Don't have an account? <a href="#register">Register here</a>.</p>
     </section>
 
+    <!-- Register -->
     <section id="register">
       <h2>Customer Registration</h2>
       <form id="registerForm">
-        <input type="text" name="firstName" placeholder="First Name" required />
-        <input type="text" name="lastName" placeholder="Last Name" required />
+        <input type="text" name="name" placeholder="Name" required />
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
         <input type="text" name="address" placeholder="Shipping Address" required />
@@ -71,6 +80,7 @@
       <p>Already have an account? <a href="#login">Login here</a>.</p>
     </section>
 
+    <!-- Basket -->
     <section id="basket">
       <h2>Shopping Basket</h2>
       <div id="basketItems">
@@ -86,6 +96,20 @@
 
   <script>
     const backendUrl = 'http://localhost:3000';
+
+    function detectCardType(number) {
+      const re = {
+        visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
+        mastercard: /^5[1-5][0-9]{14}$/,
+        amex: /^3[47][0-9]{13}$/,
+        discover: /^6(?:011|5[0-9]{2})[0-9]{12}$/
+      };
+      if (re.visa.test(number)) return 'Visa';
+      if (re.mastercard.test(number)) return 'MasterCard';
+      if (re.amex.test(number)) return 'American Express';
+      if (re.discover.test(number)) return 'Discover';
+      return 'Unknown';
+    }
 
     function updateVisibleSection() {
       const sections = {
@@ -109,9 +133,15 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
+      document.querySelector('input[name="creditCard"]').addEventListener('input', function () {
+        const cardType = detectCardType(this.value);
+        document.getElementById('cardTypeDisplay').textContent = `Card Type: ${cardType}`;
+      });
+
       document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
+
         try {
           const res = await fetch(`${backendUrl}/register`, {
             method: 'POST',
@@ -133,6 +163,7 @@
       document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
+
         try {
           const res = await fetch(`${backendUrl}/login`, {
             method: 'POST',
@@ -154,38 +185,61 @@
       });
 
       document.getElementById('checkoutBtn').addEventListener('click', () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Please login to proceed with checkout.');
-          window.location.hash = '#login';
-        } else {
-          alert('Checkout process started.');
-        }
+        window.location.hash = '#login';
       });
     });
 
-    async function loadProducts() {
+    function loadProducts() {
       const productList = document.querySelector('.product-list');
       productList.innerHTML = '';
 
-      try {
-        const res = await fetch(`${backendUrl}/products`);
-        const products = await res.json();
+      const products = [
+        {
+          category: 'Gaming PC',
+          options: [
+            { id: 1, brand: 'Asus', price: 1200, image: 'https://via.placeholder.com/150?text=Asus+PC' },
+            { id: 2, brand: 'HP', price: 1100, image: 'https://via.placeholder.com/150?text=HP+PC' },
+            { id: 3, brand: 'Acer', price: 1050, image: 'https://via.placeholder.com/150?text=Acer+PC' }
+          ]
+        },
+        {
+          category: 'Wireless Mouse',
+          options: [
+            { id: 4, brand: 'Logitech', price: 25, image: 'https://via.placeholder.com/150?text=Logitech+Mouse' },
+            { id: 5, brand: 'HP', price: 20, image: 'https://via.placeholder.com/150?text=HP+Mouse' }
+          ]
+        },
+        {
+          category: '4K Monitor',
+          options: [
+            { id: 6, brand: 'Samsung', price: 350, image: 'https://via.placeholder.com/150?text=Samsung+4K' },
+            { id: 7, brand: 'Dell', price: 330, image: 'https://via.placeholder.com/150?text=Dell+4K' },
+            { id: 8, brand: 'LG', price: 340, image: 'https://via.placeholder.com/150?text=LG+4K' }
+          ]
+        }
+      ];
 
-        products.forEach(product => {
+      products.forEach(group => {
+        const categoryHeader = document.createElement('h3');
+        categoryHeader.textContent = group.category;
+        productList.appendChild(categoryHeader);
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'category-group';
+
+        group.options.forEach(product => {
           const div = document.createElement('div');
           div.innerHTML = `
-            <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" />
-            <h3>${product.name}</h3>
-            <p>Price: $${product.price}</p>
-            <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
+            <img src="${product.image}" alt="${product.brand} ${group.category}" />
+            <p><strong>Brand:</strong> ${product.brand}</p>
+            <p><strong>Price:</strong> $${product.price}</p>
+            <button onclick="addToBasket(${product.id}, '${product.brand} ${group.category}', ${product.price})">Add to Basket</button>
           `;
-          productList.appendChild(div);
+          groupDiv.appendChild(div);
         });
-      } catch (err) {
-        productList.innerHTML = '<p>Error loading products. Try again later.</p>';
-        console.error(err);
-      }
+
+        productList.appendChild(groupDiv);
+      });
     }
 
     function addToBasket(id, name, price) {
