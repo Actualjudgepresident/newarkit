@@ -1,84 +1,41 @@
-document.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
-  updateBasketUI();
-});
+document.getElementById('registerForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
 
-function loadProducts() {
-  const productList = document.querySelector('.product-list');
-  productList.innerHTML = '';
-
-  const products = [
-    {
-      id: 1,
-      name: 'Gaming Laptop',
-      price: 1000,
-      img: 'images/laptop.jpg'
-    },
-    {
-      id: 2,
-      name: 'Wireless Mouse',
-      price: 25,
-      img: 'images/mouse.jpg'
-    },
-    {
-      id: 3,
-      name: '4K Monitor',
-      price: 350,
-      img: 'images/monitor.jpg'
-    }
-  ];
-
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.classList.add('product-card');
-    div.innerHTML = `
-      <img src="${product.img}" alt="${product.name}" />
-      <h3>${product.name}</h3>
-      <p>Price: $${product.price}</p>
-      <button onclick="addToBasket(${product.id}, '${product.name}', ${product.price})">Add to Basket</button>
-    `;
-    productList.appendChild(div);
+  const res = await fetch('http://localhost:3000/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
   });
-}
 
-function addToBasket(id, name, price) {
-  let basket = JSON.parse(localStorage.getItem('basket')) || [];
-  basket.push({ id, name, price });
-  localStorage.setItem('basket', JSON.stringify(basket));
-  updateBasketUI();
-}
-
-function updateBasketUI() {
-  const basketItems = document.getElementById('basketItems');
-  const basket = JSON.parse(localStorage.getItem('basket')) || [];
-  basketItems.innerHTML = '';
-
-  if (basket.length === 0) {
-    basketItems.innerHTML = '<p>Your basket is empty.</p>';
-    return;
+  if (res.ok) {
+    alert('Registration successful!');
+    window.location.hash = '#login';
+  } else {
+    const { message } = await res.json();
+    alert('Error: ' + message);
   }
-
-  basket.forEach(item => {
-    const div = document.createElement('div');
-    div.textContent = `${item.name} - $${item.price}`;
-    basketItems.appendChild(div);
-  });
-}
-
-document.getElementById('registerForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const email = this.email.value;
-  alert('Registration successful (demo only)');
-  localStorage.setItem('userEmail', email);
-  window.location.hash = '#products';
-  loadProducts();
 });
 
-document.getElementById('loginForm').addEventListener('submit', function (e) {
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
-  const email = this.email.value;
-  alert('Login successful (demo only)');
-  localStorage.setItem('userEmail', email);
-  window.location.hash = '#products';
-  loadProducts();
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+
+  const res = await fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) {
+    const { token } = await res.json();
+    localStorage.setItem('token', token);
+    alert('Login successful');
+    window.location.hash = '#products';
+  } else {
+    const { message } = await res.json();
+    alert('Error: ' + message);
+  }
 });
