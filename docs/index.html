@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Newark IT - Online Computer Store</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
   <header>
@@ -18,11 +18,17 @@
   </header>
 
   <main>
+    <!-- Product Section -->
     <section id="products">
       <h2>Available Products</h2>
-      <div class="product-list"></div>
+      <div class="product-scroll">
+        <div class="product-list">
+          <!-- JS will inject products here -->
+        </div>
+      </div>
     </section>
 
+    <!-- Login Form -->
     <section id="login">
       <h2>Customer Login</h2>
       <form id="loginForm">
@@ -30,8 +36,10 @@
         <input type="password" name="password" placeholder="Password" required />
         <button type="submit">Login</button>
       </form>
+      <p>Don't have an account? <a href="#register">Register here</a>.</p>
     </section>
 
+    <!-- Register Form -->
     <section id="register">
       <h2>Customer Registration</h2>
       <form id="registerForm">
@@ -42,8 +50,10 @@
         <input type="text" name="creditCard" placeholder="Credit Card" required />
         <button type="submit">Register</button>
       </form>
+      <p>Already have an account? <a href="#login">Login here</a>.</p>
     </section>
 
+    <!-- Basket -->
     <section id="basket">
       <h2>Shopping Basket</h2>
       <div id="basketItems">
