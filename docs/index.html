@@ -37,7 +37,6 @@
     <section id="products">
       <h2>Available Products</h2>
       <div class="product-list"></div>
-      <p><a href="#register">Register to buy products</a></p>
     </section>
 
     <!-- Login -->
@@ -80,7 +79,8 @@
   </footer>
 
   <script>
-    // Routing logic
+    const backendUrl = 'http://localhost:3000';
+
     function updateVisibleSection() {
       const sections = {
         products: document.getElementById("products"),
@@ -92,16 +92,10 @@
       const hash = location.hash.slice(1) || 'products';
       Object.values(sections).forEach(sec => sec.classList.remove('active'));
 
-      if (hash === 'products') {
-        sections.products.classList.add('active');
-        loadProducts();
-      } else if (hash === 'login') {
-        sections.login.classList.add('active');
-      } else if (hash === 'register') {
-        sections.register.classList.add('active');
-      } else if (hash === 'basket') {
-        sections.basket.classList.add('active');
-        updateBasketUI();
+      if (sections[hash]) {
+        sections[hash].classList.add('active');
+        if (hash === 'products') loadProducts();
+        if (hash === 'basket') updateBasketUI();
       }
     }
 
@@ -109,57 +103,59 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
-      // Register logic
       document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
 
-        const res = await fetch('http://localhost:3000/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        if (res.ok) {
-          alert('Registration successful!');
-          window.location.hash = '#products';
-        } else {
-          const { message } = await res.json();
-          alert('Error: ' + message);
+        try {
+          const res = await fetch(`${backendUrl}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) {
+            alert('Registration successful!');
+            window.location.hash = '#products';
+          } else {
+            const result = await res.json();
+            alert('Error: ' + (result.message || 'Registration failed'));
+          }
+        } catch (err) {
+          alert('Server error: ' + err.message);
         }
       });
 
-      // Login logic
       document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
 
-        const res = await fetch('http://localhost:3000/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        if (res.ok) {
-          const { token } = await res.json();
-          localStorage.setItem('token', token);
-          alert('Login successful');
-          window.location.hash = '#products';
-        } else {
-          const { message } = await res.json();
-          alert('Error: ' + message);
+        try {
+          const res = await fetch(`${backendUrl}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) {
+            const { token } = await res.json();
+            localStorage.setItem('token', token);
+            alert('Login successful!');
+            window.location.hash = '#products';
+          } else {
+            const result = await res.json();
+            alert('Error: ' + (result.message || 'Login failed'));
+          }
+        } catch (err) {
+          alert('Server error: ' + err.message);
         }
       });
 
-      // Checkout → Login
       document.getElementById('checkoutBtn').addEventListener('click', () => {
         window.location.hash = '#login';
       });
     });
 
-    // Products
     function loadProducts() {
       const productList = document.querySelector('.product-list');
       productList.innerHTML = '';
@@ -182,7 +178,6 @@
       });
     }
 
-    // Basket
     function addToBasket(id, name, price) {
       let basket = JSON.parse(localStorage.getItem('basket')) || [];
       basket.push({ id, name, price });
