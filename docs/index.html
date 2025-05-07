@@ -8,13 +8,20 @@
   <style>
     section { display: none; padding: 20px; }
     section.active { display: block; }
-    .product-list div, #basketItems div {
-      margin-bottom: 10px;
+    .product-list {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
       padding: 10px;
+    }
+    .product-list div {
+      min-width: 200px;
       border: 1px solid #ccc;
+      padding: 10px;
+      flex-shrink: 0;
     }
     .product-list img {
-      width: 150px;
+      width: 100%;
       height: auto;
       display: block;
       margin-bottom: 8px;
@@ -33,13 +40,11 @@
   </header>
 
   <main>
-    <!-- Product Section -->
     <section id="products">
       <h2>Available Products</h2>
       <div class="product-list"></div>
     </section>
 
-    <!-- Login Form -->
     <section id="login">
       <h2>Customer Login</h2>
       <form id="loginForm">
@@ -50,7 +55,6 @@
       <p>Don't have an account? <a href="#register">Register here</a>.</p>
     </section>
 
-    <!-- Register Form -->
     <section id="register">
       <h2>Customer Registration</h2>
       <form id="registerForm">
@@ -67,7 +71,6 @@
       <p>Already have an account? <a href="#login">Login here</a>.</p>
     </section>
 
-    <!-- Basket -->
     <section id="basket">
       <h2>Shopping Basket</h2>
       <div id="basketItems">
@@ -81,9 +84,6 @@
     <p>&copy; 2025 Newark IT. All rights reserved.</p>
   </footer>
 
-<<<<<<< HEAD
-  <script src="script.js"></script>
-=======
   <script>
     const backendUrl = 'http://localhost:3000';
 
@@ -109,7 +109,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateVisibleSection();
 
-      // Register
       document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
@@ -131,7 +130,6 @@
         }
       });
 
-      // Login
       document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
@@ -155,7 +153,6 @@
         }
       });
 
-      // Checkout → login if not authenticated
       document.getElementById('checkoutBtn').addEventListener('click', () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -215,6 +212,5 @@
       });
     }
   </script>
->>>>>>> ca394d368c1e284a9a89aac5fa5c0ca55f824eb8
 </body>
 </html>
